@@ -230,6 +230,62 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
             </div>
           )}
 
+          {showInvoice && (
+            <div style={{ padding: '16px 20px 28px' }} data-testid="screen-invoice-detail">
+              <div style={{ fontSize: '11.5px', color: '#8795a3', marginBottom: '6px' }}>Invoices / <span style={{ color: '#4c5a68' }}>{cur.number}</span></div>
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: '14px' }}>
+                <div>
+                  <h1 data-testid="invoice-title" style={{ margin: 0, fontSize: '18px', fontWeight: 600, letterSpacing: '-0.2px' }}>{cur.number} <span data-testid="invoice-status-chip" style={headChipStyle}>{headStatus}</span></h1>
+                  <div style={{ color: '#6b7a89', fontSize: '12px', marginTop: '3px' }}>{cur.customer} · issued {cur.issued} · due {cur.due}</div>
+                </div>
+                <div style={{ flex: 1 }}></div>
+                <button className="lg-btn" data-testid="invoice-send-reminder" style={{ height: '28px', padding: '0 12px', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontSize: '12px', cursor: 'pointer' }}>Send reminder</button>
+                <button className="lg-btn" data-testid="invoice-credit-note" style={{ height: '28px', padding: '0 12px', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontSize: '12px', cursor: 'pointer' }}>Credit note</button>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.55fr) minmax(260px,1fr)', gap: '16px', alignItems: 'start' }}>
+                <div style={{ background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'minmax(130px,1fr) 60px 74px 92px', padding: '0 12px', height: '28px', alignItems: 'center', background: '#f7f9fb', borderBottom: '1px solid #d8dee6', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.03em', color: '#6b7a89' }}>
+                    <div>Description</div><div style={{ textAlign: 'right' }}>Qty</div><div style={{ textAlign: 'right' }}>BTW</div><div style={{ textAlign: 'right' }}>Amount</div>
+                  </div>
+                  {lines.map((l, i) => (
+                    <div key={i} style={{ display: 'grid', gridTemplateColumns: 'minmax(130px,1fr) 60px 74px 92px', padding: '8px 12px', alignItems: 'center', borderBottom: '1px solid #edf1f4', fontVariantNumeric: 'tabular-nums' }}>
+                      <div style={{ paddingRight: '10px' }}>{l.desc}</div>
+                      <div style={{ textAlign: 'right', color: '#5b6b7a' }}>{l.qty}</div>
+                      <div style={{ textAlign: 'right', color: '#5b6b7a' }}>{l.vat}</div>
+                      <div style={{ textAlign: 'right' }}>{l.amount}</div>
+                    </div>
+                  ))}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', padding: '10px 12px', fontVariantNumeric: 'tabular-nums' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#5b6b7a' }}><span>Subtotal</span><span>{eur(Math.round(cur.totalCents / 1.21) / 100)}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#5b6b7a' }}><span>BTW 21%</span><span>{eur((cur.totalCents - Math.round(cur.totalCents / 1.21)) / 100)}</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, fontSize: '14px', paddingTop: '5px', borderTop: '1px solid #e4e9ee' }}><span>Total</span><span>{cur.total}</span></div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div data-testid="payment-section" style={{ background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', padding: '12px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.05em', color: '#6b7a89', marginBottom: '9px' }}>Payment</div>
+
+                    {cur.status !== "Paid" && (
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontVariantNumeric: 'tabular-nums', marginBottom: '4px' }}><span style={{ color: '#5b6b7a' }}>Amount due</span><span style={{ fontWeight: 600 }}>€ 2 812,50</span></div>
+                        <div style={{ color: '#6b7a89', fontSize: '12px', marginBottom: '10px' }}>{cur.status === "Overdue" ? "Past the due date. No payments recorded." : "Due " + cur.due + ". No payments recorded."}</div>
+                        <button className="lg-btn" data-testid="mark-as-paid" disabled={!props.user.canWrite} onClick={openPay} style={{ width: '100%', height: '30px', background: '#1a6091', border: '1px solid #1a6091', borderRadius: '3px', color: '#fff', font: 'inherit', fontSize: '12.5px', fontWeight: 600, cursor: 'pointer' }}>Mark as paid</button>
+                      </div>
+                    )}
+
+                  </div>
+
+                  <div style={{ background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', padding: '12px', fontSize: '12px', color: '#5b6b7a', lineHeight: '1.5' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.05em', color: '#6b7a89', marginBottom: '8px' }}>Customer</div>
+                    {cur.customer}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 

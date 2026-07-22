@@ -289,6 +289,38 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
         </div>
       </div>
 
+      {effectivePayOpen && (
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(31,41,51,.34)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div data-testid="record-payment-dialog" style={{ width: '380px', maxWidth: '100%', background: '#fff', border: '1px solid #c6cfd8', borderRadius: '4px', boxShadow: '0 8px 28px rgba(31,41,51,.22)', fontFamily: "'Source Sans 3',system-ui,sans-serif" }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '11px 14px', borderBottom: '1px solid #e4e9ee' }}>
+              <span style={{ fontSize: '14px', fontWeight: 600 }}>{payTitle}</span>
+              <button className="lg-btn" data-testid="dialog-close" onClick={closePay} style={{ width: '22px', height: '22px', background: 'transparent', border: '1px solid transparent', borderRadius: '3px', color: '#6b7a89', font: 'inherit', cursor: 'pointer' }}>✕</button>
+            </div>
+            <div style={{ padding: '13px 14px', display: 'flex', flexDirection: 'column', gap: '11px' }}>
+              <div style={{ fontSize: '12px', color: '#5b6b7a' }}>{cur.number} · {cur.customer} · total {cur.total}</div>
+              {payError && <div data-testid="pay-error" role="alert" style={{ background: '#fdeceb', border: '1px solid #f0cdc9', borderRadius: '3px', padding: '7px 9px', fontSize: '12px', color: '#a32b25' }}>{payError}</div>}
+              <label style={{ display: 'block' }}>
+                <span style={{ display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em', color: '#6b7a89', marginBottom: '4px' }}>Amount received</span>
+                <input data-testid="pay-amount-input" value={payAmount} readOnly style={{ width: '100%', height: '30px', padding: '0 8px', boxSizing: 'border-box', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontVariantNumeric: 'tabular-nums' }} />
+              </label>
+              <div style={{ display: 'flex', gap: '9px' }}>
+                <label style={{ flex: 1 }}>
+                  <span style={{ display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em', color: '#6b7a89', marginBottom: '4px' }}>Date</span>
+                  <input data-testid="pay-date-input" defaultValue={new Date().toLocaleDateString("nl-NL").replace(/\//g, "-")} style={{ width: '100%', height: '30px', padding: '0 8px', boxSizing: 'border-box', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit' }} />
+                </label>
+                <label style={{ flex: 1 }}>
+                  <span style={{ display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em', color: '#6b7a89', marginBottom: '4px' }}>Method</span>
+                  <select data-testid="pay-method-select" style={{ width: '100%', height: '30px', padding: '0 6px', boxSizing: 'border-box', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', background: '#fff' }}><option>SEPA bank transfer</option><option>iDEAL</option><option>Cash</option></select>
+                </label>
+              </div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', padding: '11px 14px', background: '#fafbfc', borderTop: '1px solid #e4e9ee' }}>
+              <button className="lg-btn" data-testid="pay-cancel" onClick={closePay} style={{ height: '29px', padding: '0 12px', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontSize: '12px', cursor: 'pointer' }}>Cancel</button>
+              <button className="lg-btn" data-testid="pay-confirm" onClick={confirmPay} style={{ height: '29px', padding: '0 14px', background: '#1a6091', border: '1px solid #1a6091', borderRadius: '3px', color: '#fff', font: 'inherit', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>{payConfirmLabel}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

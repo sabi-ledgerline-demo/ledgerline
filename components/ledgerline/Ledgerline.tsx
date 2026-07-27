@@ -286,6 +286,52 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
             </div>
           )}
 
+          {showRecon && (
+            <div style={{ padding: '16px 20px 24px' }} data-testid="screen-reconciliation">
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px', marginBottom: '12px' }}>
+                <div>
+                  <h1 style={{ margin: 0, fontSize: '18px', fontWeight: 600, letterSpacing: '-0.2px' }}>Reconciliation</h1>
+                  <div style={{ color: '#6b7a89', fontSize: '12px', marginTop: '2px' }}>ING Business · NL91 INGB 0002 4455 88 · synced 08:12 today</div>
+                </div>
+                <div style={{ flex: 1 }}></div>
+                <button className="lg-btn" data-testid="matching-rules" style={{ height: '28px', padding: '0 12px', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontSize: '12px', cursor: 'pointer' }}>Matching rules</button>
+              </div>
+
+              <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', height: '24px', padding: '0 9px', borderRadius: '3px', background: '#fff5e4', border: '1px solid #ecd5a6', color: '#8a5a12', fontSize: '11.5px', fontWeight: 600 }}>3 exceptions</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', height: '24px', padding: '0 9px', borderRadius: '3px', background: '#fff', border: '1px solid #d8dee6', color: '#4c5a68', fontSize: '11.5px' }}>62 matched this month</span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.5fr) minmax(250px,1fr)', gap: '16px', alignItems: 'start' }}>
+                <div style={{ background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', overflow: 'hidden', overflowX: 'auto' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '70px minmax(150px,1fr) 96px 132px', minWidth: '460px', padding: '0 12px', height: '28px', alignItems: 'center', background: '#f7f9fb', borderBottom: '1px solid #d8dee6', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.03em', color: '#6b7a89' }}>
+                    <div>Date</div><div>Counterparty</div><div style={{ textAlign: 'right' }}>Amount</div><div style={{ paddingLeft: '12px' }}>Match</div>
+                  </div>
+                  {txns.map((t) => (
+                    <div key={t.testid} className="lg-row" data-testid={t.testid} onClick={t.select} style={t.rowStyle}>
+                      <div style={{ color: '#5b6b7a', fontSize: '12px' }}>{t.date}</div>
+                      <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: '10px' }}>{t.party}<div style={{ fontSize: '11px', color: '#8795a3', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.ref}</div></div>
+                      <div style={{ textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{t.amount}</div>
+                      <div style={{ paddingLeft: '12px' }}><span style={t.chipStyle}>{t.match}</span></div>
+                    </div>
+                  ))}
+                </div>
+
+                <div data-testid="match-panel" style={{ background: '#fff', border: '1px solid #d8dee6', borderTop: '2px solid #c88a1e', borderRadius: '3px', padding: '12px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.05em', color: '#8a5a12', marginBottom: '8px' }}>Exception · partial match</div>
+                  <div style={{ fontSize: '13px', fontWeight: 600 }}>€ 1 250,00 from Bakkerij De Korenhalm B.V.</div>
+                  <p style={{ margin: '5px 0 10px', color: '#5b6b7a', fontSize: '12px', lineHeight: '1.5' }}>{exceptionCopy}</p>
+                  <div style={{ border: '1px solid #e4e9ee', borderRadius: '3px', padding: '8px 9px', fontSize: '12px', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#1a6091', fontWeight: 600 }}>INV-2026-0412</span><span style={{ fontVariantNumeric: 'tabular-nums' }}>€ 2 812,50</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6b7a89', marginTop: '2px' }}><span>Covers 44%</span><span style={{ fontVariantNumeric: 'tabular-nums' }}>shortfall € 1 562,50</span></div>
+                  </div>
+                  <button className="lg-btn" data-testid={matchActionTestid} style={{ width: '100%', height: '30px', background: '#1a6091', border: '1px solid #1a6091', borderRadius: '3px', color: '#fff', font: 'inherit', fontSize: '12.5px', fontWeight: 600, cursor: 'pointer' }}>{matchActionLabel}</button>
+                  <button className="lg-btn" data-testid="match-leave-unmatched" style={{ width: '100%', height: '28px', marginTop: '6px', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontSize: '12px', cursor: 'pointer' }}>Leave unmatched</button>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 

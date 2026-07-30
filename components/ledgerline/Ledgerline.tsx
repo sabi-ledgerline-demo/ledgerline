@@ -332,6 +332,47 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
             </div>
           )}
 
+          {showReports && (
+            <div style={{ padding: '16px 20px 24px' }} data-testid="screen-reports">
+              <h1 style={{ margin: '0 0 2px', fontSize: '18px', fontWeight: 600, letterSpacing: '-0.2px' }}>Reports</h1>
+              <div style={{ color: '#6b7a89', fontSize: '12px', marginBottom: '14px' }}>Financial year 2026 · accrual basis</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(232px,1fr))', gap: '12px' }}>
+                <div data-testid="report-vat" style={{ background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', padding: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}><span style={{ fontSize: '13px', fontWeight: 600 }}>VAT return (BTW)</span><span style={{ fontSize: '11px', color: '#8a5a12', background: '#fff5e4', border: '1px solid #ecd5a6', borderRadius: '3px', padding: '1px 6px' }}>Open</span></div>
+                  <div style={{ color: '#6b7a89', fontSize: '12px', margin: '3px 0 9px' }}>Q3 2026 · 1 Jul – 30 Sep · due 31 Oct</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontVariantNumeric: 'tabular-nums', fontSize: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#5b6b7a' }}>BTW charged (21%)</span><span>€ 9 442,18</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#5b6b7a' }}>BTW charged (9%)</span><span>€ 612,40</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#5b6b7a' }}>Input BTW deductible</span><span>− € 3 118,07</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, paddingTop: '4px', borderTop: '1px solid #e4e9ee' }}><span>Payable</span><span>€ 6 936,51</span></div>
+                  </div>
+                  <button className="lg-btn" data-testid="vat-review" style={{ width: '100%', height: '28px', marginTop: '10px', background: '#1a6091', border: '1px solid #1a6091', borderRadius: '3px', color: '#fff', font: 'inherit', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>Review return</button>
+                </div>
+                <div data-testid="report-pl" style={{ background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', padding: '12px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 600 }}>Profit &amp; loss</span>
+                  <div style={{ color: '#6b7a89', fontSize: '12px', margin: '3px 0 9px' }}>Year to date</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontVariantNumeric: 'tabular-nums', fontSize: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#5b6b7a' }}>Revenue</span><span>€ 214 880,00</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#5b6b7a' }}>Costs</span><span>− € 151 204,60</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 600, paddingTop: '4px', borderTop: '1px solid #e4e9ee' }}><span>Result</span><span>€ 63 675,40</span></div>
+                  </div>
+                  <button className="lg-btn" data-testid="pl-open" style={{ width: '100%', height: '28px', marginTop: '10px', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontSize: '12px', cursor: 'pointer' }}>Open report</button>
+                </div>
+                <div data-testid="report-ar" style={{ background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', padding: '12px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 600 }}>Aged receivables</span>
+                  <div style={{ color: '#6b7a89', fontSize: '12px', margin: '3px 0 9px' }}>As at 13 Sep 2026</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', fontVariantNumeric: 'tabular-nums', fontSize: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#5b6b7a' }}>Not yet due</span><span>€ 28 410,00</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#5b6b7a' }}>1–30 days</span><span>€ 9 122,50</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#5b6b7a' }}>31–60 days</span><span>€ 3 940,00</span></div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}><span style={{ color: '#5b6b7a' }}>60+ days</span><span>€ 1 205,00</span></div>
+                  </div>
+                  <button className="lg-btn" data-testid="ar-open" style={{ width: '100%', height: '28px', marginTop: '10px', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontSize: '12px', cursor: 'pointer' }}>Open report</button>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 

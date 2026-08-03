@@ -373,6 +373,19 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
             </div>
           )}
 
+          {showEmpty && (
+            <div style={{ padding: '16px 20px' }} data-testid="screen-contacts">
+              <h1 style={{ margin: '0 0 2px', fontSize: '18px', fontWeight: 600, letterSpacing: '-0.2px' }}>Suppliers</h1>
+              <div style={{ color: '#6b7a89', fontSize: '12px', marginBottom: '14px' }}>Contacts / Suppliers</div>
+              <div data-testid="state-empty" style={{ background: '#fff', border: '1px dashed #cdd6de', borderRadius: '3px', padding: '34px 20px', textAlign: 'center', maxWidth: '520px' }}>
+                <div style={{ width: '34px', height: '34px', margin: '0 auto 10px', border: '1px solid #d8dee6', borderRadius: '3px' }}></div>
+                <div style={{ fontSize: '14px', fontWeight: 600 }}>No suppliers yet</div>
+                <p style={{ margin: '5px auto 12px', maxWidth: '330px', color: '#6b7a89', fontSize: '12px', lineHeight: '1.5' }}>Suppliers appear here once you add them or import a purchase invoice. Customers are unaffected.</p>
+                <button className="lg-btn" data-testid="supplier-add" style={{ height: '28px', padding: '0 12px', background: '#1a6091', border: '1px solid #1a6091', borderRadius: '3px', color: '#fff', font: 'inherit', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>Add supplier</button>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 

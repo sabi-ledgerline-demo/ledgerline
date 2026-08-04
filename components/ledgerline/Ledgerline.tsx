@@ -386,6 +386,26 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
             </div>
           )}
 
+          {showShallow && (
+            <div style={{ padding: '16px 20px' }} data-testid="screen-shallow">
+              <h1 style={{ margin: '0 0 2px', fontSize: '18px', fontWeight: 600, letterSpacing: '-0.2px' }}>{shallow.title}</h1>
+              <div style={{ color: '#6b7a89', fontSize: '12px', marginBottom: '14px' }}>{shallow.sub}</div>
+              <div style={{ background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', overflow: 'hidden', overflowX: 'auto', maxWidth: '760px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '92px minmax(150px,1fr) 104px 96px', minWidth: '460px', padding: '0 12px', height: '28px', alignItems: 'center', background: '#f7f9fb', borderBottom: '1px solid #d8dee6', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.03em', color: '#6b7a89' }}>
+                  <div>Date</div><div>{shallow.col}</div><div style={{ textAlign: 'right' }}>Amount</div><div style={{ paddingLeft: '12px' }}>Method</div>
+                </div>
+                {shallow.rows.map((s, i) => (
+                  <div key={i} className="lg-row" style={{ display: 'grid', gridTemplateColumns: '92px minmax(150px,1fr) 104px 96px', minWidth: '460px', padding: '0 12px', height: '32px', alignItems: 'center', borderBottom: '1px solid #edf1f4', fontVariantNumeric: 'tabular-nums' }}>
+                    <div style={{ color: '#5b6b7a', fontSize: '12px' }}>{s.date}</div>
+                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', paddingRight: '10px' }}>{s.name}</div>
+                    <div style={{ textAlign: 'right' }}>{s.amount}</div>
+                    <div style={{ paddingLeft: '12px', color: '#5b6b7a', fontSize: '12px' }}>{s.method}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 

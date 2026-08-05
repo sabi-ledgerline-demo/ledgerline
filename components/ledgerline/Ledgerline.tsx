@@ -373,6 +373,27 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
             </div>
           )}
 
+          {showSettings && (
+            <div style={{ padding: '16px 20px 24px' }} data-testid="screen-settings-users">
+              <h1 style={{ margin: '0 0 2px', fontSize: '18px', fontWeight: 600, letterSpacing: '-0.2px' }}>Users and roles</h1>
+              <div style={{ color: '#6b7a89', fontSize: '12px', marginBottom: '14px' }}>Business plan · 5 of 10 seats used</div>
+              <div style={{ background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', overflow: 'hidden', overflowX: 'auto', maxWidth: '720px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(160px,1fr) 150px 130px 78px', minWidth: '530px', padding: '0 12px', height: '28px', alignItems: 'center', background: '#f7f9fb', borderBottom: '1px solid #d8dee6', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.03em', color: '#6b7a89' }}>
+                  <div>User</div><div>Role</div><div>Last active</div><div></div>
+                </div>
+                {users.map((u) => (
+                  <div key={u.testid} style={{ display: 'grid', gridTemplateColumns: 'minmax(160px,1fr) 150px 130px 78px', minWidth: '530px', padding: '8px 12px', alignItems: 'center', borderBottom: '1px solid #edf1f4' }}>
+                    <div>{u.name}<div style={{ fontSize: '11px', color: '#8795a3' }}>{u.email}</div></div>
+                    <div style={{ fontSize: '12px' }}>{u.role}<div style={{ fontSize: '11px', color: '#8795a3' }}>{u.scope}</div></div>
+                    <div style={{ fontSize: '12px', color: '#5b6b7a' }}>{u.active}</div>
+                    <div><button className="lg-btn" data-testid={u.testid} style={{ height: '24px', padding: '0 8px', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontSize: '11.5px', cursor: 'pointer' }}>Edit</button></div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: '12px', fontSize: '11.5px', color: '#8795a3', maxWidth: '720px' }}>Roles available on this plan: Owner, Bookkeeper, Accountant (external), Viewer.</div>
+            </div>
+          )}
+
           {showEmpty && (
             <div style={{ padding: '16px 20px' }} data-testid="screen-contacts">
               <h1 style={{ margin: '0 0 2px', fontSize: '18px', fontWeight: 600, letterSpacing: '-0.2px' }}>Suppliers</h1>

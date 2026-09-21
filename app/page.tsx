@@ -12,10 +12,10 @@ const nl = (d: Date) => d.toISOString().slice(0, 10).split("-").reverse().join("
 export default async function Page() {
   const session = readSession((await cookies()).get(COOKIE)?.value);
   if (!session) redirect("/login");
-  const { rows } = await db().query("select number, customer, issued, due, total_cents, status from invoice order by position");
+  const { rows } = await db().query("select i.number, i.customer, i.issued, i.due, i.total_cents, i.status, coalesce((select sum(amount_cents) from payment p where p.invoice_number = i.number), 0)::int as paid_cents from invoice i order by i.position");
   const invoices: InvoiceRow[] = rows.map((r) => ({
     number: r.number, customer: r.customer, issued: nl(r.issued), due: nl(r.due),
-    total: eur(r.total_cents / 100), totalCents: r.total_cents, status: r.status
+    total: eur(r.total_cents / 100), totalCents: r.total_cents, paidCents: r.paid_cents, status: r.status
   }));
   const screens = ["invoices", "payments", "reconciliation", "contacts", "reports", "settings"].filter((s) => canSee(session.role, s));
   return (

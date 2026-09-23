@@ -7,7 +7,7 @@ import { cssToObj } from "./cssToObj";
 import type { LedgerlineProps } from "./types";
 export type { LedgerlineProps, LedgerlineScreen } from "./types";
 
-export type InvoiceRow = { number: string; customer: string; issued: string; due: string; total: string; totalCents: number; status: string };
+export type InvoiceRow = { number: string; customer: string; issued: string; due: string; total: string; totalCents: number; paidCents: number; status: string };
 
 type User = { name: string; email: string; role: string; canWrite: boolean; screens: string[] };
 
@@ -16,6 +16,8 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
   const [payOpen, setPayOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [payError, setPayError] = useState("");
+  const [payMode, setPayMode] = useState<"full" | "partial">("full");
+  const [payAmount, setPayAmount] = useState("");
   const router = useRouter();
   const [selectedTxn, setSelectedTxn] = useState("txn-exception");
   const [filter, setFilter] = useState<string | undefined>(undefined);
@@ -30,7 +32,7 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
   const go = (s: string) => () => { setScreen(s); setPayOpen(false); };
   const invoices = props.invoices;
   const cur = invoices.find((r) => r.number === selected) || invoices[0];
-  const valid = ["All", "Open", "Paid", "Overdue", "Draft", "Credited"];
+  const valid = ["All", "Open", "Partially paid", "Paid", "Overdue", "Draft", "Credited"];
   const active = valid.indexOf(filter || "") >= 0 ? (filter as string) : "All";
   const matching = active === "All" ? invoices : invoices.filter((r) => r.status === active);
   const shown = matching.slice(0, 12);
@@ -62,7 +64,7 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
   const txnRows = [
     { date: "12-09", party: "Hoekstra Installatietechniek", ref: "SEPA · NL21 ABNA 0417 1643 00", amount: "€ 1 815,00", match: "Matched" },
     { date: "11-09", party: "Kaashandel Wouters NV", ref: "iDEAL · order 88213", amount: "€ 642,50", match: "Matched" },
-    { date: "09-09", party: "Bakkerij De Korenhalm B.V.", ref: "SEPA · ref INV-2026-0412", amount: "€ 1 250,00", match: "No match" },
+    { date: "09-09", party: "Bakkerij De Korenhalm B.V.", ref: "SEPA · ref INV-2026-0412", amount: "€ 1 250,00", match: "Partial match" },
     { date: "08-09", party: "Belastingdienst", ref: "BTW Q2 2026", amount: "− € 5 402,00", match: "Matched" },
     { date: "05-09", party: "De Groene Gracht VOF", ref: "SEPA · ref INV-2026-0388", amount: "€ 3 025,00", match: "Matched" },
     { date: "04-09", party: "Unknown payer", ref: "SEPA · no reference", amount: "€ 210,00", match: "No match" },
@@ -133,19 +135,30 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
 
   const headStatus = cur.status;
   const headChipStyle: CSSProperties = { ...cssToObj(chip(cur.status)), marginLeft: 6, verticalAlign: "2px" };
-  const exceptionCopy = "The amount received does not equal any open invoice. Ledgerline cannot match a transaction to part of an invoice.";
-  const matchActionLabel = "Match to invoice";
-  const matchActionTestid = "match-full";
+  const exceptionCopy = "The amount received covers part of INV-2026-0412. Matching it records a partial payment and leaves the remaining balance open.";
+  const matchActionLabel = "Match as partial payment";
+  const matchActionTestid = "match-partial";
 
   const effectivePayOpen = payOpen;
-  const payTitle = "Mark as paid";
-  const payConfirmLabel = "Confirm payment";
-  const payAmount = cur.total.replace("€ ", "");
-  const openPay = () => { setPayError(""); setPayOpen(true); };
+  const remaining = cur.totalCents - cur.paidCents;
+  const toInput = (c: number) => (c / 100).toFixed(2).replace(".", ",");
+  const toCents = (v: string) => Math.round(parseFloat(v.replace(/\./g, "").replace(",", ".")) * 100);
+  const enteredCents = toCents(payAmount);
+  const amountOk = Number.isFinite(enteredCents) && enteredCents > 0 && enteredCents <= remaining;
+  const partialMode = payMode === "partial";
+  const payTitle = "Record payment";
+  const payConfirmLabel = partialMode ? "Record partial payment" : "Confirm payment";
+  const segStyle = (on: boolean) => cssToObj("flex:1;height:28px;background:" + (on ? "#1a6091" : "#fff") + ";border:0;border-right:1px solid #d8dee6;color:" + (on ? "#fff" : "#4c5a68") + ";font:inherit;font-size:12px;font-weight:" + (on ? "600" : "400") + ";cursor:pointer");
+  const fullStyle = segStyle(!partialMode);
+  const partialStyle: CSSProperties = { ...segStyle(partialMode), borderRight: 0 };
+  const pickFull = () => { setPayMode("full"); setPayAmount(toInput(remaining)); };
+  const pickPartial = () => { setPayMode("partial"); setPayAmount(""); };
+  const openPay = () => { setPayError(""); setPayMode("full"); setPayAmount(toInput(remaining)); setPayOpen(true); };
   const closePay = () => setPayOpen(false);
   const confirmPay = async () => {
+    if (!amountOk) { setPayError("Enter an amount above zero and not more than the remaining balance of " + eur(remaining / 100) + "."); return; }
     const method = (document.querySelector('[data-testid="pay-method-select"]') as HTMLSelectElement | null)?.value;
-    const res = await fetch("/api/payments", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ invoice: cur.number, method }) });
+    const res = await fetch("/api/payments", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ invoice: cur.number, method, amountCents: enteredCents }) });
     if (!res.ok) { setPayError(((await res.json().catch(() => ({}))) as { error?: string }).error || "Payment could not be recorded. Try again."); return; }
     setPayOpen(false);
     router.refresh();
@@ -267,14 +280,15 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
                   <div data-testid="payment-section" style={{ background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', padding: '12px' }}>
                     <div style={{ fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.05em', color: '#6b7a89', marginBottom: '9px' }}>Payment</div>
 
-                    {cur.status !== "Paid" && (
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontVariantNumeric: 'tabular-nums', marginBottom: '4px' }}><span style={{ color: '#5b6b7a' }}>Amount due</span><span style={{ fontWeight: 600 }}>€ 2 812,50</span></div>
-                        <div style={{ color: '#6b7a89', fontSize: '12px', marginBottom: '10px' }}>{cur.status === "Overdue" ? "Past the due date. No payments recorded." : "Due " + cur.due + ". No payments recorded."}</div>
-                        <button className="lg-btn" data-testid="mark-as-paid" disabled={!props.user.canWrite} onClick={openPay} style={{ width: '100%', height: '30px', background: '#1a6091', border: '1px solid #1a6091', borderRadius: '3px', color: '#fff', font: 'inherit', fontSize: '12.5px', fontWeight: 600, cursor: 'pointer' }}>Mark as paid</button>
-                      </div>
-                    )}
-
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontVariantNumeric: 'tabular-nums', marginTop: '3px' }}><span style={{ color: '#5b6b7a' }}>Invoice total</span><span>{cur.total}</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontVariantNumeric: 'tabular-nums', marginTop: '3px' }}><span style={{ color: '#5b6b7a' }}>Received</span><span data-testid="amount-received" style={{ color: '#1f6b3f' }}>{eur(cur.paidCents / 100)}</span></div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontVariantNumeric: 'tabular-nums', marginTop: '3px', fontWeight: 600 }}><span>Remaining balance</span><span data-testid="remaining-balance">{eur(remaining / 100)}</span></div>
+                      <div style={{ height: '5px', borderRadius: '3px', background: '#e8edf1', margin: '10px 0 4px', overflow: 'hidden' }}><div style={{ width: Math.round((cur.paidCents / cur.totalCents) * 100) + '%', height: '100%', background: '#c88a1e' }}></div></div>
+                      <div style={{ fontSize: '11.5px', color: '#6b7a89', marginBottom: '10px' }}>{Math.round((cur.paidCents / cur.totalCents) * 100)}% received</div>
+                      {cur.status !== "Paid" && <button className="lg-btn" data-testid="record-payment" disabled={!props.user.canWrite} onClick={openPay} style={{ width: '100%', height: '30px', background: '#1a6091', border: '1px solid #1a6091', borderRadius: '3px', color: '#fff', font: 'inherit', fontSize: '12.5px', fontWeight: 600, cursor: 'pointer' }}>Record payment</button>}
+                      {cur.paidCents > 0 && <button className="lg-btn" data-testid="view-payment-history" style={{ width: '100%', height: '28px', marginTop: '6px', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontSize: '12px', cursor: 'pointer' }}>Payment history</button>}
+                    </div>
                   </div>
 
                   <div style={{ background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', padding: '12px', fontSize: '12px', color: '#5b6b7a', lineHeight: '1.5' }}>
@@ -440,9 +454,13 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
             <div style={{ padding: '13px 14px', display: 'flex', flexDirection: 'column', gap: '11px' }}>
               <div style={{ fontSize: '12px', color: '#5b6b7a' }}>{cur.number} · {cur.customer} · total {cur.total}</div>
               {payError && <div data-testid="pay-error" role="alert" style={{ background: '#fdeceb', border: '1px solid #f0cdc9', borderRadius: '3px', padding: '7px 9px', fontSize: '12px', color: '#a32b25' }}>{payError}</div>}
+              <div style={{ display: 'flex', gap: 0, border: '1px solid #d8dee6', borderRadius: '3px', overflow: 'hidden', overflowX: 'auto' }}>
+                <button className="lg-btn" data-testid="pay-amount-full" onClick={pickFull} style={fullStyle}>Full amount</button>
+                <button className="lg-btn" data-testid="pay-amount-partial" onClick={pickPartial} style={partialStyle}>Partial amount</button>
+              </div>
               <label style={{ display: 'block' }}>
                 <span style={{ display: 'block', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.04em', color: '#6b7a89', marginBottom: '4px' }}>Amount received</span>
-                <input data-testid="pay-amount-input" value={payAmount} readOnly style={{ width: '100%', height: '30px', padding: '0 8px', boxSizing: 'border-box', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontVariantNumeric: 'tabular-nums' }} />
+                <input data-testid="pay-amount-input" value={payAmount} onChange={(e) => setPayAmount(e.target.value)} style={{ width: '100%', height: '30px', padding: '0 8px', boxSizing: 'border-box', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontVariantNumeric: 'tabular-nums' }} />
               </label>
               <div style={{ display: 'flex', gap: '9px' }}>
                 <label style={{ flex: 1 }}>
@@ -454,6 +472,9 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
                   <select data-testid="pay-method-select" style={{ width: '100%', height: '30px', padding: '0 6px', boxSizing: 'border-box', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', background: '#fff' }}><option>SEPA bank transfer</option><option>iDEAL</option><option>Cash</option></select>
                 </label>
               </div>
+              {partialMode && amountOk && enteredCents < remaining && (
+                <div data-testid="pay-remaining-note" style={{ background: '#fff5e4', border: '1px solid #ecd5a6', borderRadius: '3px', padding: '7px 9px', fontSize: '12px', color: '#7a4f10' }}>Remaining balance after this payment: <strong>{eur((remaining - enteredCents) / 100)}</strong>. The invoice stays open with status <strong>Partially paid</strong>.</div>
+              )}
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', padding: '11px 14px', background: '#fafbfc', borderTop: '1px solid #e4e9ee' }}>
               <button className="lg-btn" data-testid="pay-cancel" onClick={closePay} style={{ height: '29px', padding: '0 12px', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontSize: '12px', cursor: 'pointer' }}>Cancel</button>

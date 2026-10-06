@@ -31,3 +31,5 @@ npm run build                # production build
 `data-testid` attributes are on every interactive element. Renaming one breaks automated checks.
 
 See `docs/v2/ledgerline.md` for details.
+
+<!-- staging smoke test 2026-10-06 -->

@@ -36,3 +36,5 @@ See `docs/v2/ledgerline.md` for details.
 <!-- production check 2026-10-06 -->
 
 Staging smoke check, 10 Oct 2026.
+
+Production worker check, 10 Oct 2026.

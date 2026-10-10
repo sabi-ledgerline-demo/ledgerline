@@ -38,3 +38,5 @@ See `docs/v2/ledgerline.md` for details.
 Staging smoke check, 10 Oct 2026.
 
 Production worker check, 10 Oct 2026.
+
+Production worker check 2, 10 Oct 2026.

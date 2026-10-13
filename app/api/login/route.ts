@@ -12,6 +12,6 @@ export async function POST(req: Request) {
     return NextResponse.redirect(new URL("/login?error=1", req.url), 303);
   }
   const res = NextResponse.redirect(new URL("/", req.url), 303);
-  res.cookies.set(COOKIE, signSession({ email, name: u.name, role: u.role as Role }), { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 60 * 60 * 8 });
+  res.cookies.set(COOKIE, signSession({ email, name: u.name, role: u.role as Role }), { httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 60 * 60 * 12 });
   return res;
 }

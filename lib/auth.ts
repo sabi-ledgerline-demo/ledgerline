@@ -4,7 +4,7 @@ export type Role = "Owner" | "Bookkeeper" | "Accountant" | "Viewer";
 export type Session = { email: string; name: string; role: Role; exp: number };
 
 export const COOKIE = "ll_session";
-const TTL_SECONDS = 60 * 60 * 8;
+const TTL_SECONDS = 60 * 60 * 12;
 
 function secret(): string {
   const s = process.env.SESSION_SECRET;

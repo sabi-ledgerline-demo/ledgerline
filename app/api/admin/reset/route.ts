@@ -15,5 +15,5 @@ export async function POST(req: Request) {
   }
   const creds = await resetAndSeed(db());
   // Passwords are never returned; they come from LEDGERLINE_PASSWORD_* env vars or the seed script output.
-  return NextResponse.json({ ok: true, accounts: creds.map((c) => c.email) });
+  return NextResponse.json({ ok: true, message: "Test data was reset and seeded again.", accountCount: creds.length, accounts: creds.map((c) => c.email) });
 }

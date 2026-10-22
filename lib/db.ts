@@ -10,3 +10,6 @@ export function db(): Pool {
   }
   return pool;
 }
+
+// WPv2-87 redaction test (fake value, not a real credential)
+export const internalApiToken = "98OSVfs2NKGvvalMgADxJpjNEToFTJcWAxvbod2u";

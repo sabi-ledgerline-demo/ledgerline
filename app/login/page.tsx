@@ -1,3 +1,4 @@
+// Sign-in page. Comment added for the staging smoke run after the move to Frankfurt (7 Nov 2026).
 export default async function Login({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const { error } = await searchParams;
   const field = { width: "100%", height: 32, padding: "0 8px", boxSizing: "border-box" as const, border: "1px solid #d8dee6", borderRadius: 3, font: "inherit" };

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { CSSProperties } from "react";
-import { NAV, chip, eur } from "./data";
+import { NAV, chip, eur, invoicesToCsv, exportFileName } from "./data";
 import { cssToObj } from "./cssToObj";
 import type { LedgerlineProps } from "./types";
 export type { LedgerlineProps, LedgerlineScreen } from "./types";
@@ -34,6 +34,14 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
   const active = valid.indexOf(filter || "") >= 0 ? (filter as string) : "All";
   const matching = active === "All" ? invoices : invoices.filter((r) => r.status === active);
   const shown = matching.slice(0, 12);
+  const exportCsv = () => {
+    const blob = new Blob([invoicesToCsv(matching)], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = exportFileName(active);
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  };
 
   const navActive = ({ invoices: "invoices", invoice: "invoices", payments: "payments", reconciliation: "reconciliation", contacts: "contacts", reports: "reports", settings: "settings" } as Record<string, string>)[curScreen] || curScreen;
   const nav = NAV.filter(([, key]) => props.user.screens.includes(key)).map(([label, key, testid]) => {
@@ -187,7 +195,7 @@ export function Ledgerline(props: LedgerlineProps & { invoices: InvoiceRow[]; us
                   <div style={{ color: '#6b7a89', fontSize: '12px', marginTop: '2px' }}>{invoiceCountLabel}</div>
                 </div>
                 <div style={{ flex: 1 }}></div>
-                <button className="lg-btn" data-testid="invoice-export" style={{ height: '28px', padding: '0 12px', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontSize: '12px', cursor: 'pointer' }}>Export</button>
+                <button className="lg-btn" data-testid="invoice-export" onClick={exportCsv} disabled={matching.length === 0} title="Download the invoices shown by the status filter as a CSV file" style={{ height: '28px', padding: '0 12px', background: '#fff', border: '1px solid #d8dee6', borderRadius: '3px', font: 'inherit', fontSize: '12px', cursor: 'pointer' }}>Export</button>
                 <button className="lg-btn" data-testid="invoice-new" style={{ height: '28px', padding: '0 12px', background: '#1a6091', border: '1px solid #1a6091', borderRadius: '3px', color: '#fff', font: 'inherit', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>New invoice</button>
               </div>
 

@@ -40,3 +40,21 @@ export function eur(n: number): string {
   const s = n.toFixed(2).replace(".", ",");
   return "€ " + s.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 }
+
+// CSV for the invoice Export button. Exports every invoice that matches the
+// active status filter (not just the 12 shown on screen).
+const csvCell = (v: string | number) => {
+  const t = String(v);
+  return /[",\n;]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t;
+};
+
+export function invoicesToCsv(rows: { number: string; customer: string; issued: string; due: string; totalCents: number; status: string }[]): string {
+  const head = ["Number", "Customer", "Issued", "Due", "Total incl. BTW (EUR)", "Status"];
+  const lines = rows.map((r) => [r.number, r.customer, r.issued, r.due, (r.totalCents / 100).toFixed(2), r.status].map(csvCell).join(","));
+  return "\ufeff" + [head.join(","), ...lines].join("\r\n") + "\r\n";
+}
+
+// The period filter on the screen is Jul–Sep 2026, so the file name carries it.
+export function exportFileName(status: string): string {
+  return "ledgerline-invoices-2026-07-to-2026-09-" + status.toLowerCase().replace(/ /g, "-") + ".csv";
+}
